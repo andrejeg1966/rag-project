@@ -1,0 +1,44 @@
+[project]
+name = "rag-project"
+version = "0.1.0"
+description = "RAG project demo"
+readme = "README.md"
+authors = [
+    { name = "Goran Andrejevic", email = "goran.andrejevic@web.de" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-openai>=0.3.0",
+    "langchain-community>=0.3.27",
+    "langchain-qdrant>=0.1.0",
+    "openai>=1.60.0",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.1",
+    "qdrant-client>=1.13.3",
+    "fastembed>=0.2.0",
+    "sentence-transformers>=3.3.1",
+    "rank-bm25>=0.2.2",
+    "langchain-core>=0.3.27",
+    "langchain-text-splitters>=0.3.27",
+    "langchainhub>=0.1.0",
+]
+
+[project.scripts]
+rag-project = "rag_project:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.16.2",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]

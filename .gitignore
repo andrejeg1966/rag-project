@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Secrets
+.env
+*.env
+credentials.json
+
+# RAG-spezifisch
+data/
+documents/
+*.faiss
+*.index
+*.pkl
+*.bin
+chroma_db/
+vectorstore/
+models/
+*.sqlite3
+
+# Notebooks & IDE
+.ipynb_checkpoints/
+.vscode/
+.idea/
