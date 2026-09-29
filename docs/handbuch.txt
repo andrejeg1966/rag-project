@@ -1,0 +1,203 @@
+Benutzerhandbuch für das Kundenportal
+
+Das Kundenportal bündelt alle Vorgänge rund um Ihr Benutzerkonto: Anmeldung,
+Passwortverwaltung, Abrechnung, Support und Ihre persönlichen Einstellungen. Dieses
+Handbuch beschreibt die einzelnen Bereiche und die Regeln, die dort gelten. Die
+folgenden zehn Kapitel führen in der Reihenfolge durch die Funktionen, die Sie im
+Portal am häufigsten nutzen.
+
+1. Benutzeranmeldung
+
+Der Zugang zum Kundenportal ist durch eine E-Mail-Adresse und ein persönliches
+Passwort geschützt. Beide Angaben geben Sie auf der Anmeldeseite ein; danach steht
+Ihnen das Portal in vollem Umfang zur Verfügung. Aus Sicherheitsgründen wird jedes
+Konto nach mehreren fehlgeschlagenen Anmeldeversuchen vorübergehend gesperrt, damit
+niemand das Passwort durch Ausprobieren erraten kann. Die Sperre hebt sich
+automatisch auf, eine Benachrichtigung an den Support ist nicht notwendig.
+
+- Anmeldung mit E-Mail-Adresse und Passwort
+- Nach drei fehlgeschlagenen Versuchen wird das Konto für 15 Minuten gesperrt
+- Die Sperre endet automatisch
+
+1.1 Woran erkenne ich eine Sperre?
+
+Bei einer Sperre erscheint beim Anmeldeversuch ein Hinweis mit der verbleibenden
+Wartezeit. Warten Sie diese Zeit ab und melden Sie sich anschließend erneut an. Ist
+das Passwort in der Zwischenzeit vergessen worden, hilft Kapitel 2 weiter.
+
+2. Passwort zurücksetzen
+
+Wenn Sie Ihr Passwort nicht mehr kennen, steht auf der Anmeldeseite der Link
+"Passwort vergessen" bereit. Nach Auswahl des Links geben Sie die E-Mail-Adresse an,
+die in Ihrem Konto hinterlegt ist. Das System versendet daraufhin eine Nachricht mit
+einem Link, über den Sie ein neues Passwort vergeben können. Dieser Link ist
+bewusst nur kurz gültig: Er verliert nach 30 Minuten seine Gültigkeit. Sollte die
+E-Mail nicht innerhalb weniger Minuten eintreffen, prüfen Sie bitte Ihren
+Spam-Ordner, bevor Sie den Vorgang erneut starten.
+
+- Link "Passwort vergessen" auf der Anmeldeseite
+- E-Mail-Adresse des Kontos angeben
+- Der Link zum Zurücksetzen ist 30 Minuten gültig
+
+2.1 Was passiert nach Ablauf des Links?
+
+Nach Ablauf der Frist führt der Link zu einer Fehlermeldung. Fordern Sie in diesem
+Fall einfach einen neuen Link über dieselbe Seite an; eine Begrenzung der Anzahl ist
+nicht vorgesehen.
+
+3. Zwei-Faktor-Authentifizierung
+
+Mit der Zwei-Faktor-Authentifizierung sichern Sie Ihr Konto zusätzlich ab. Neben dem
+Passwort verlangt das Portal dann einen zweiten Nachweis, den ein Angreifer nicht
+einfach mitlesen kann. Aktiviert wird die Funktion in den Kontoeinstellungen. Zur
+Auswahl stehen Authenticator-Apps auf dem Smartphone sowie Einmalcodes, die per
+E-Mail verschickt werden. Die Einrichtung einer Authenticator-App gilt als die
+sicherere Variante, weil der Code das Gerät nicht verlässt.
+
+- Aktivierung in den Kontoeinstellungen
+- Unterstützt werden Authenticator-Apps und Einmalcodes per E-Mail
+- Empfehlung: Authenticator-App verwenden
+
+3.1 Was tun, wenn das Zweitgerät verloren geht?
+
+Geht das Smartphone verloren, ist die Anmeldung zunächst nicht möglich. Wenden Sie
+sich in diesem Fall an den Support, der die Zwei-Faktor-Authentifizierung nach einer
+Identitätsprüfung zurücksetzt.
+
+4. Rechnungen
+
+Alle Rechnungen zu Ihrem Vertrag finden Sie im Menü "Abrechnung". Dort stehen sie
+als PDF-Datei zum Herunterladen bereit, sodass Sie sie speichern, ausdrucken oder an
+Ihre Buchhaltung weitergeben können. Rechnungen bleiben fünf Jahre im Kundenportal
+verfügbar. Laden Sie wichtige Belege daher rechtzeitig herunter, wenn Sie sie
+länger aufbewahren möchten.
+
+- Menü "Abrechnung"
+- Download als PDF-Datei
+- Aufbewahrung im Portal: fünf Jahre
+
+4.1 Finde ich ältere Rechnungen noch?
+
+Nach Ablauf der fünf Jahre werden Rechnungen aus dem Portal entfernt. Benötigen Sie
+einen älteren Beleg, kann der Support ihn in der Regel gegen eine Bearbeitungsgebühr
+nachliefern.
+
+5. Support
+
+Für Fragen und Störungen steht Ihnen der Support zur Seite. Erreichbar ist er
+montags bis freitags von 08:00 bis 18:00 Uhr. Anfragen reichen Sie am einfachsten
+über das Kontaktformular im Kundenportal ein; auf diesem Weg sind Ihre Kontodaten
+bereits hinterlegt und die Bearbeitung geht schneller. Anfragen außerhalb der
+Servicezeiten werden am folgenden Werktag bearbeitet.
+
+- Servicezeiten: Montag bis Freitag, 08:00 bis 18:00 Uhr
+- Kontaktformular im Kundenportal
+- Anfragen außerhalb der Zeiten werden am nächsten Werktag bearbeitet
+
+5.1 Welche Angaben helfen bei einer Anfrage?
+
+Nennen Sie im Formular möglichst Ihre Kundennummer, den betroffenen Bereich und eine
+kurze Beschreibung. Screenshots beschleunigen die Klärung technischer Probleme.
+
+6. Benutzerprofil bearbeiten
+
+Ihre persönlichen Angaben pflegen Sie im Menü "Mein Profil". Dort lassen sich Name,
+Telefonnummer und bevorzugte Sprache ändern. Die bevorzugte Sprache bestimmt, in
+welcher Sprache Sie Benachrichtigungen und Hinweise aus dem Portal erhalten. Eine
+Änderung der E-Mail-Adresse ist aus Sicherheitsgründen nicht sofort wirksam: Das
+System verschickt an die neue Adresse einen Bestätigungslink, der 24 Stunden gültig
+ist. Erst nach Bestätigung wird die Änderung übernommen.
+
+- Name, Telefonnummer und bevorzugte Sprache änderbar
+- E-Mail-Änderung nur mit Bestätigungslink
+- Der Bestätigungslink ist 24 Stunden gültig
+
+6.1 Warum wird die E-Mail-Adresse gesondert bestätigt?
+
+Die E-Mail-Adresse dient zugleich als Anmeldename und als Empfänger für
+Sicherheitsmitteilungen. Die Bestätigung stellt sicher, dass die Adresse wirklich
+Ihnen gehört und nicht durch einen Tippfehler ein fremdes Postfach adressiert wird.
+
+7. Benachrichtigungen
+
+Im Menü "Benachrichtigungen" legen Sie fest, welche Mitteilungen Sie erhalten
+möchten. Zur Auswahl stehen E-Mail-Benachrichtigungen und Hinweise innerhalb des
+Portals; beide Wege lassen sich unabhängig voneinander einstellen. Sicherheitsrelevante
+Mitteilungen, etwa zu Anmeldungen oder Passwortänderungen, können nicht vollständig
+deaktiviert werden. Diese Ausnahme schützt Ihr Konto: Sie sollen bemerken, wenn
+jemand anderes Zugriff auf Ihr Konto zu nehmen versucht.
+
+- Auswahl zwischen E-Mail- und Portalbenachrichtigungen
+- Beide Wege unabhängig einstellbar
+- Sicherheitsrelevante Mitteilungen sind nicht vollständig abschaltbar
+
+7.1 Was zählt als sicherheitsrelevante Mitteilung?
+
+Dazu gehören Hinweise zu Anmeldungen von neuen Geräten, zu Passwort- und
+E-Mail-Änderungen sowie zu Sperren des Kontos. Diese Nachrichten erreichen Sie immer
+über den hinterlegten Kontaktweg.
+
+8. Dokumente hochladen
+
+Im Bereich "Dokumente" können Sie eigene Dateien ablegen und sie dem Support oder
+Sachbearbeitern zur Verfügung stellen. Unterstützt werden die Formate PDF, PNG und
+JPG; die maximale Dateigröße beträgt 10 MB. Größere Dateien teilen Sie bitte auf
+oder wandeln sie in ein kompakteres PDF um. Hochgeladene Dokumente können innerhalb
+von 30 Tagen wieder gelöscht werden. Danach entfernt das System sie automatisch.
+
+- Formate: PDF, PNG und JPG
+- Maximale Dateigröße: 10 MB
+- Löschen möglich innerhalb von 30 Tagen
+
+8.1 Warum wird mein Dokument nicht angenommen?
+
+Meist liegt es an der Dateigröße oder am Format. Prüfen Sie die Angaben über der
+Dateiauswahl; bei einem anderen Format konvertieren Sie die Datei vorher, etwa mit
+einem PDF-Export aus Ihrem Textprogramm.
+
+9. Benutzerkonto deaktivieren
+
+Möchten Sie das Portal nicht mehr nutzen, lässt sich das Konto unter
+"Kontoeinstellungen" deaktivieren. Nach der Deaktivierung ist keine Anmeldung mehr
+möglich, die hinterlegten Daten bleiben aber zunächst erhalten. Innerhalb von 14 Tagen
+kann der Support das Konto wiederherstellen, falls Sie Ihre Entscheidung ändern.
+Nach Ablauf dieser Frist wird das Konto endgültig gelöscht; eine Wiederherstellung ist
+dann nicht mehr möglich.
+
+- Deaktivierung unter "Kontoeinstellungen"
+- Keine Anmeldung nach der Deaktivierung
+- Wiederherstellung durch den Support innerhalb von 14 Tagen
+- Danach endgültige Löschung
+
+9.1 Was geschieht mit meinen Rechnungen bei der Löschung?
+
+Mit der endgültigen Löschung des Kontos wird auch der Zugriff auf die im Portal
+gespeicherten Rechnungen entfernt. Laden Sie Belege, die Sie weiterhin benötigen,
+vorher herunter.
+
+10. Datenschutz und Sitzungsdauer
+
+Das Portal beendet eine Sitzung automatisch, wenn 20 Minuten lang keine Aktivität
+erfolgt ist. Dieser Schutz verhindert, dass ein unbeaufsichtigter Rechner den Zugang
+offen lässt. Arbeiten Sie an einem öffentlichen oder geteilten Gerät, melden Sie sich
+zusätzlich von Hand ab. Ihre personenbezogenen Daten können Sie im Bereich
+"Datenschutz" exportieren. Je nach Umfang der gespeicherten Angaben kann die
+Erstellung des Exports bis zu 24 Stunden dauern; Sie werden benachrichtigt, sobald
+die Daten bereitstehen.
+
+- Automatische Abmeldung nach 20 Minuten ohne Aktivität
+- Datenexport im Bereich "Datenschutz" möglich
+- Erstellung des Exports dauert bis zu 24 Stunden
+
+10.1 Aus welchen Gründen wird eine Sitzung beendet?
+
+Neben der Inaktivität endet eine Sitzung beim Abmelden, beim Schließen des Browsers
+in manchen Konfigurationen sowie bei einer Passwortänderung. In allen Fällen ist eine
+erneute Anmeldung erforderlich.
+
+Glossar
+
+- Kundenportal: die Webanwendung, in der Sie Ihr Konto verwalten.
+- Sitzung: der Zeitraum zwischen Anmeldung und Abmeldung.
+- Zwei-Faktor-Authentifizierung: Anmeldung mit Passwort und einem zweiten Nachweis.
+- Authenticator-App: Programm auf dem Smartphone, das Einmalcodes erzeugt.
