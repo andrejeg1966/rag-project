@@ -6,18 +6,46 @@ Ein einfaches Python-Projekt für Retrieval-Augmented Generation (RAG)-Experimen
 
 ```text
 RAG-projects/
-├── .venv/                  # virtuelle Python-Umgebung
+├── .venv/                          # virtuelle Python-Umgebung
+├── docs/
+│   └── handbuch.txt               # Projekt-/Nutzungsdokumentation
+├── documents/                     # Eingabedokumente oder Beispiel-Daten
+├── htmlcov/                       # Coverage-HTML-Berichte
+│   ├── index.html
+│   ├── status.json
+│   └── ...
+├── scratch/
+│   └── clean.txt                  # temporäre oder explorative Dateien
 ├── src/
 │   └── rag_project/
-│       ├── __init__.py    # Projekt-Initialisierung und Einstiegspunkt
-│       └── ...            # weitere Module und RAG-Komponenten
+│       ├── __init__.py            # Paketinitialisierung
+│       ├── chunking.py            # Chunking-Logik
+│       ├── cleaning.py            # Bereinigung und Vorverarbeitung
+│       ├── config.py              # Konfiguration und Einstellungen
+│       ├── loading.py             # Laden von Daten/Modellen
+│       ├── main.py                # Einstiegspunkt des Projekts
+│       ├── main_chatbot.py        # Chatbot-Skripte
+│       ├── main_chunking.py      # Chunking-Utilities
+│       ├── main_cleaning.py      # Bereinigungs-Utilities
+│       ├── main_loading.py        # Lade-Utilities
+│       ├── math_utils.py          # mathematische Hilfsfunktionen
+│       ├── models.py              # Datenmodelle
+│       ├── paths.py               # Pfad- und Dateistrukturlogik
+│       ├── providers.py           # Provider-/API-Integrationen
+│       └── ...
 ├── tests/
 │   ├── __init__.py
-│   └── test_main.py       # Basis-Tests für das Projekt
-├── pyproject.toml         # Projektkonfiguration, Abhängigkeiten und Pytest-Setup
-├── README.md              # Projektbeschreibung
-├── uv.lock                # Lock-Datei für die Abhängigkeitsverwaltung
-└── .gitignore             # Git-Ignore-Dateien (falls vorhanden)
+│   ├── test_config_and_models.py
+│   ├── test_main_chatbot.py
+│   ├── test_main.py
+│   ├── test_paths.py
+│   └── ...
+├── coverage.json                  # Coverage-Metadaten
+├── pyproject.toml                 # Projektkonfiguration und Abhängigkeiten
+├── README.md                      # Projektbeschreibung
+├── uv.lock                        # Lock-Datei für die Abhängigkeitsverwaltung
+├── .gitignore                     # Git-Ignore-Dateien
+└── .python-version                # optionales Python-Tooling-Setup
 ```
 
 ## Source-Ordner
@@ -119,65 +147,3 @@ uv run rag-project
 ## Lizenz
 
 Das Projekt ist derzeit ohne spezielle Lizenzangabe konfiguriert. Bitte bei Bedarf eine passende Open-Source-Lizenz ergänzen.
-
-## Framwork
-
-Welche Modelle zur Wahl stehen
-
-```bash
-uv run rag-project --models
-```
-
-Modelwechsel fuer einen einzelnen Lauf
-
-```bash
-uv run python -m rag_project.main_chatbot --model openrouter:z-ai/glm-5.3
-```
-
-Im Code — wenn der Bot fest gebunden sein soll
-
-```bash
-bot = ChatBot(model="openrouter:deepseek/deepseek-v4-flash")
-```
-
-## Virtuelle Umgebung anlegen und Abhängigkeiten installieren
-
-```bash
-uv sync
-```
-
-## Prüfen, ob die .env gefunden wird und der Key des Providers da ist
-
-```bash
-uv run rag-project --show-config
-```
-
-## Prüfen, ob Provider + Modell sauber aufgelöst werden
-
-```bash
-uv run rag-project --check
-```
-
-## Katalog anzeigen (das * markiert den Default je Provider)
-
-```bash
-uv run rag-project --models
-```
-
-## Tests laufen lassen
-
-```bash
-uv run pytest -q
-```
-
-## führt den Chatbot aus
-
-```bash
-uv run python -m rag_project.main_chatbot
-```
-
-## importiert nur die Klasse, startet nichts
-
-```bash
-uv run python -c "from rag_project.main_chatbot import ChatBot; print(ChatBot)"
-```

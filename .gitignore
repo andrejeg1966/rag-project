@@ -13,6 +13,7 @@ credentials.json
 # RAG-spezifisch
 data/
 documents/
+scratch/
 *.faiss
 *.index
 *.pkl
