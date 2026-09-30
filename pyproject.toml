@@ -27,6 +27,10 @@ dependencies = [
 
 [project.scripts]
 rag-project = "rag_project:main"
+chatbot = "rag_project.main_chatbot:main"
+cleaning = "rag_project.main_cleaning:main"
+loading = "rag_project.main_loading:main"
+chunking = "rag_project.main_chunking:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

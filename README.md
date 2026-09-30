@@ -119,3 +119,65 @@ uv run rag-project
 ## Lizenz
 
 Das Projekt ist derzeit ohne spezielle Lizenzangabe konfiguriert. Bitte bei Bedarf eine passende Open-Source-Lizenz ergänzen.
+
+## Framwork
+
+Welche Modelle zur Wahl stehen
+
+```bash
+uv run rag-project --models
+```
+
+Modelwechsel fuer einen einzelnen Lauf
+
+```bash
+uv run python -m rag_project.main_chatbot --model openrouter:z-ai/glm-5.3
+```
+
+Im Code — wenn der Bot fest gebunden sein soll
+
+```bash
+bot = ChatBot(model="openrouter:deepseek/deepseek-v4-flash")
+```
+
+## Virtuelle Umgebung anlegen und Abhängigkeiten installieren
+
+```bash
+uv sync
+```
+
+## Prüfen, ob die .env gefunden wird und der Key des Providers da ist
+
+```bash
+uv run rag-project --show-config
+```
+
+## Prüfen, ob Provider + Modell sauber aufgelöst werden
+
+```bash
+uv run rag-project --check
+```
+
+## Katalog anzeigen (das * markiert den Default je Provider)
+
+```bash
+uv run rag-project --models
+```
+
+## Tests laufen lassen
+
+```bash
+uv run pytest -q
+```
+
+## führt den Chatbot aus
+
+```bash
+uv run python -m rag_project.main_chatbot
+```
+
+## importiert nur die Klasse, startet nichts
+
+```bash
+uv run python -c "from rag_project.main_chatbot import ChatBot; print(ChatBot)"
+```
