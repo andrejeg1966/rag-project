@@ -16,13 +16,13 @@ from typing import Any
 
 from langchain_openai import ChatOpenAI
 
-from rag_project.config import (
+from rag_project.core.config import (
     ChatProvider,
     Settings,
     describe_settings,
     get_settings,
 )
-from rag_project.models import ModelInfo, UnknownModelError, registry
+from rag_project.core.models import ModelInfo, UnknownModelError, registry
 
 
 class ProviderError(RuntimeError):

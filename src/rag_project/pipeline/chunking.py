@@ -1,7 +1,7 @@
 """Chunking fuer die RAG-Pipeline.
 
 Reine Bibliothek -- keine CLI, kein ``argparse``. Die Ausfuehrung liegt in
-:mod:`rag_project.main_chunking`.
+:mod:`rag_project.app.main_chunking`.
 
 Verantwortung:
     - Dokumente in ueberlappende Textstuecke aufteilen

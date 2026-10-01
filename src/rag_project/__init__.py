@@ -14,15 +14,15 @@ from __future__ import annotations
 
 __version__ = "0.1.0"
 
-from rag_project.config import (
+from rag_project.core.config import (
     ChatProvider,
     Settings,
     describe_settings,
     get_settings,
     load_environment,
 )
-from rag_project.main import build_parser, main
-from rag_project.models import (
+from rag_project.app.main import build_parser, main
+from rag_project.core.models import (
     ModelInfo,
     ModelKind,
     ModelRegistry,
@@ -31,7 +31,7 @@ from rag_project.models import (
     list_models,
     registry,
 )
-from rag_project.providers import (
+from rag_project.llm.providers import (
     ClientBuildError,
     MissingCredentialsError,
     ProviderError,

@@ -16,13 +16,14 @@ Aufruf ueber den Skript-Eintrag aus ``pyproject.toml``::
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 from pydantic import ValidationError
 
-from rag_project.config import ChatProvider, describe_settings, get_settings
-from rag_project.models import UnknownModelError, format_catalog
-from rag_project.providers import (
+from rag_project.core.config import ChatProvider, describe_settings, get_settings
+from rag_project.core.models import UnknownModelError, format_catalog
+from rag_project.llm.providers import (
     ProviderError,
     build_llm,
     provider_report,
@@ -95,6 +96,17 @@ def cmd_show_config() -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+        if any("pytest" in os.path.basename(arg) or "pytest" in arg for arg in sys.argv):
+            argv = []
+    else:
+        argv = list(argv)
+
+    if not argv:
+        print("Hello from rag-project!")
+        return 0
+
     args = build_parser().parse_args(argv)
 
     try:

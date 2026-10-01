@@ -24,14 +24,15 @@ dependencies = [
     "langchain-text-splitters>=0.3.27",
     "langchainhub>=0.1.0",
     "pypdf>=6.19.0",
+    "wikipedia>=1.4.0",
 ]
 
 [project.scripts]
 rag-project = "rag_project:main"
-chatbot = "rag_project.main_chatbot:main"
-cleaning = "rag_project.main_cleaning:main"
-loading = "rag_project.main_loading:main"
-chunking = "rag_project.main_chunking:main"
+chatbot = "rag_project.app.main_chatbot:main"
+cleaning = "rag_project.app.main_cleaning:main"
+loading = "rag_project.app.main_loading:main"
+chunking = "rag_project.app.main_chunking:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

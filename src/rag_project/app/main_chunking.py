@@ -22,7 +22,7 @@ Schalter ``--load-jsonl``: Er legt den Ladesatz ab, bevor bereinigt und
 gechunkt wird. Ein zweiter Lauf kann denselben Satz dann wiederverwenden.
 
 Aufruf:
-    uv run python -m rag_project.main_chunking --help
+    uv run python -m rag_project.app.main_chunking --help
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from rag_project.chunking import (
+from rag_project.pipeline.chunking import (
     HANDBOOK_SEPARATORS,
     STRATEGIES,
     chunks_to_markdown,
@@ -42,15 +42,15 @@ from rag_project.chunking import (
     format_strategy_comparison,
     split_documents,
 )
-from rag_project.cleaning import clean_documents, format_cleaning_stats
-from rag_project.loading import (
+from rag_project.pipeline.cleaning import clean_documents, format_cleaning_stats
+from rag_project.pipeline.loading import (
     LoaderDependencyError,
     UnsupportedFormatError,
     from_jsonl,
     load_documents,
     to_jsonl,
 )
-from rag_project.paths import (
+from rag_project.core.paths import (
     DocumentPathError,
     describe_paths,
     resolve_documents,

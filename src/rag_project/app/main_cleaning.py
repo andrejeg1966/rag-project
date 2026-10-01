@@ -8,7 +8,7 @@ Pfade aus der ``.env`` gelesen (``DOCS_DIR``, ``DEFAULT_DOCUMENT``,
 ``DOCUMENT_FILES``), sonst der Fallback ``docs/handbuch.txt``.
 
 Aufruf:
-    uv run python -m rag_project.main_cleaning --help
+    uv run python -m rag_project.app.main_cleaning --help
 """
 
 from __future__ import annotations
@@ -18,14 +18,14 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from rag_project.cleaning import (
+from rag_project.pipeline.cleaning import (
     clean_documents,
     format_cleaning_report,
     format_cleaning_stats,
     join_cleaned_text,
 )
-from rag_project.loading import UnsupportedFormatError, load_documents
-from rag_project.paths import (
+from rag_project.pipeline.loading import UnsupportedFormatError, load_documents
+from rag_project.core.paths import (
     DocumentPathError,
     describe_paths,
     resolve_documents,

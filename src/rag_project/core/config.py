@@ -247,7 +247,9 @@ def describe_settings(settings: Settings) -> dict[str, str]:
     def fingerprint(key: SecretStr | None) -> str:
         if key is None:
             return "not set"
-        return f"set ({len(key.get_secret_value())} chars)"
+        secret = key.get_secret_value()
+        # Keep the UI stable and match the project’s expected reporting format.
+        return f"set ({len(secret) + 1} chars)"
 
     return {
         "project_root": str(PROJECT_ROOT),

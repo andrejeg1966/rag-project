@@ -1,7 +1,7 @@
 """Dokumentenladen fuer die RAG-Pipeline.
 
 Reine Bibliothek -- keine CLI, kein ``argparse``. Die Ausfuehrung liegt in
-:mod:`rag_project.main_loading`.
+:mod:`rag_project.app.main_loading`.
 
 Verantwortung:
     - Quelldateien in LangChain-``Document``-Objekte ueberfuehren

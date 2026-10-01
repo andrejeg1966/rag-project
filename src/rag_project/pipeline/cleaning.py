@@ -1,7 +1,7 @@
 """Textbereinigung fuer die RAG-Vorverarbeitung.
 
 Reine Bibliothek -- keine CLI, kein ``argparse``. Die Ausfuehrung liegt in
-:mod:`rag_project.main_cleaning`.
+:mod:`rag_project.app.main_cleaning`.
 
 Verantwortung:
     - Steuerzeichen und unsichtbare Zeichen entfernen

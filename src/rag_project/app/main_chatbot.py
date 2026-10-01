@@ -15,7 +15,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Iterator, Sequence
 
-from rag_project.providers import build_llm, provider_report, resolve_target
+from rag_project.llm.providers import build_llm, provider_report, resolve_target
 
 # ---------------------------------------------------------------------------
 # Konstanten

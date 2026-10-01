@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Iterable
 
-from rag_project.config import ChatProvider
+from rag_project.core.config import ChatProvider
 
 
 class ModelKind(str, Enum):
@@ -72,7 +72,7 @@ class ModelInfo:
 
 OPENROUTER_MODELS: tuple[ModelInfo, ...] = (
     ModelInfo(
-        id="openai/gpt-5.6-luna",
+        id="gpt-5.6-luna",
         provider=ChatProvider.OPENROUTER,
         label="GPT-5.6 Luna (via OpenRouter)",
         kind=ModelKind.BALANCED,

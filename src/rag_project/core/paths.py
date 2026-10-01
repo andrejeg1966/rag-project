@@ -22,7 +22,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, Sequence
 
-from rag_project.config import (
+from rag_project.core.config import (
     DEFAULT_DOCS_DIR,
     DEFAULT_DOCUMENT_NAME,
     PROJECT_ROOT,
