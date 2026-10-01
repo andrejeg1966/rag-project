@@ -40,9 +40,14 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable, Sequence
+
+from rag_project.core.config import load_environment
+
+load_environment()
 
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_core.documents import Document
@@ -287,8 +292,10 @@ def _load_url(source: str, on_event: EventHook | None) -> list[Document]:
     (WebBaseLoader,) = _import_or_die(
         "langchain_community.document_loaders", ["WebBaseLoader"], "beautifulsoup4"
     )
+    user_agent = os.getenv("USER_AGENT")
+    headers = {"User-Agent": user_agent} if user_agent else None
     _emit(on_event, f"[netz]  {source}")
-    return WebBaseLoader(source).load()
+    return WebBaseLoader(source, header_template=headers).load()
 
 
 def _load_wikipedia(
