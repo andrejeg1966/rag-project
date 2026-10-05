@@ -22,7 +22,7 @@ Unterstuetzte Quellen:
         .pdf             PyPDFLoader
 
     Netzbasiert (explizit anzugeben, keine Endung):
-        http:// https:// WebBaseLoader
+        http:// https:// WebBaseLoader (HTML) oder PyPDFLoader (PDF)
         wikipedia:...    WikipediaLoader
         csv:...          CSVLoader fuer entfernte Dateien
 
@@ -41,11 +41,16 @@ import csv
 import io
 import json
 import os
+import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable, Sequence
+from urllib.parse import quote, unquote, urlsplit
 
-from rag_project.core.config import load_environment
+import requests
+
+from rag_project.core.config import DEFAULT_DOCS_DIR, PROJECT_ROOT, load_environment
 
 load_environment()
 
@@ -298,6 +303,202 @@ def _load_url(source: str, on_event: EventHook | None) -> list[Document]:
     return WebBaseLoader(source, header_template=headers).load()
 
 
+def _is_pdf_url(source: str) -> bool:
+    """Erkennt PDF-URLs anhand des URL-Pfads, auch mit Query-Parametern."""
+    return Path(urlsplit(source).path).suffix.lower() == ".pdf"
+
+
+def _load_remote_pdf(
+    source: str, on_event: EventHook | None
+) -> tuple[list[Document], int]:
+    """Laedt eine PDF-URL temporaer herunter und liest sie mit PyPDFLoader."""
+    user_agent = os.getenv("USER_AGENT")
+    headers = {"User-Agent": user_agent} if user_agent else None
+    _emit(on_event, f"[netz]  {source}")
+
+    with requests.get(source, headers=headers, timeout=30) as response:
+        response.raise_for_status()
+        content = response.content
+
+    if b"%PDF-" not in content[:1024]:
+        raise ValueError(f"URL liefert keine gueltige PDF-Datei: {source}")
+
+    with tempfile.TemporaryDirectory() as directory:
+        pdf_path = Path(directory) / "download.pdf"
+        pdf_path.write_bytes(content)
+        documents = PyPDFLoader(str(pdf_path)).load()
+
+    docs_directory = PROJECT_ROOT / DEFAULT_DOCS_DIR
+    docs_directory.mkdir(parents=True, exist_ok=True)
+    original_name = Path(unquote(urlsplit(source).path)).name or "download.pdf"
+    destination = docs_directory / original_name
+    counter = 1
+    while destination.exists():
+        if destination.read_bytes() == content:
+            break
+        destination = docs_directory / f"{Path(original_name).stem}_{counter}{Path(original_name).suffix}"
+        counter += 1
+    else:
+        destination.write_bytes(content)
+
+    _emit(on_event, f"[gespeichert] {destination}")
+    return documents, len(content)
+
+
+def _wikipedia_cache_path(topic: str, language: str) -> Path:
+    """Pfad zur lokalen Wikipedia-Cache-Datei fuer den Suchbegriff."""
+    slug = "".join(ch if ch.isalnum() or ch in {"-", "_"} else "_" for ch in topic)
+    return Path.cwd() / ".cache" / "wikipedia" / language / f"{slug}.json"
+
+
+def _load_wikipedia_from_cache(topic: str, language: str) -> list[Document] | None:
+    """Laedt ein bereits gecachtes Wikipedia-Ergebnis, falls vorhanden."""
+    cache_path = _wikipedia_cache_path(topic, language)
+    if not cache_path.exists():
+        return None
+
+    try:
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+    documents: list[Document] = []
+    for item in payload:
+        documents.append(
+            Document(
+                page_content=item["page_content"],
+                metadata=item.get("metadata", {}),
+            )
+        )
+    return documents or None
+
+
+def _load_wikipedia_direct(
+    topic: str,
+    *,
+    language: str = "de",
+    max_docs: int = 1,
+) -> list[Document]:
+    """Laedt Wikipedia-Artikel direkt ueber die API als robusten Fallback.
+
+    Der ``wikipedia``-Wrapper ist in manchen Umgebungen empfindlich auf leere
+    oder nicht-JSON-Antworten der API; hier nutzen wir die JSON-API mit einer
+    expliziten User-Agent-Header-Kombination und fangen nicht-JSON-Antworten
+    sauber ab. Bei HTTP 429 wird der Request mit kurzer Backoff wiederholt;
+    eine erfolgreiche Antwort wird lokal gecacht, damit weitere Runs nicht
+    erneut gegen die Rate-Limits laufen.
+    """
+    cached = _load_wikipedia_from_cache(topic, language)
+    if cached is not None:
+        return cached
+
+    user_agent = os.getenv(
+        "WIKIPEDIA_USER_AGENT", "rag-project/0.1.0 (Wikipedia loader)"
+    )
+    headers = {"User-Agent": user_agent}
+    base = f"https://{language}.wikipedia.org/w/api.php"
+
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            search_params = {
+                "action": "query",
+                "list": "search",
+                "format": "json",
+                "srsearch": topic,
+                "srlimit": max_docs,
+                "srnamespace": 0,
+                "utf8": 1,
+            }
+            search_response = requests.get(
+                base,
+                params=search_params,
+                headers=headers,
+                timeout=30,
+            )
+            search_response.raise_for_status()
+            search_payload = search_response.json()
+            titles = [
+                hit["title"] for hit in search_payload.get("query", {}).get("search", [])
+            ]
+
+            if not titles:
+                titles = [topic]
+
+            extract_params = {
+                "action": "query",
+                "prop": "extracts",
+                "explaintext": 1,
+                "format": "json",
+                "redirects": 1,
+                "titles": "|".join(quote(title, safe="") for title in titles),
+                "utf8": 1,
+            }
+            extract_response = requests.get(
+                base,
+                params=extract_params,
+                headers=headers,
+                timeout=30,
+            )
+            extract_response.raise_for_status()
+            pages = extract_response.json().get("query", {}).get("pages", {})
+
+            documents: list[Document] = []
+            for index, page in enumerate(pages.values()):
+                if page.get("missing"):
+                    continue
+                content = (page.get("extract") or "").strip()
+                if not content:
+                    continue
+                documents.append(
+                    Document(
+                        page_content=content,
+                        metadata={
+                            "source": f"wikipedia:{topic}",
+                            "file_name": f"wikipedia:{topic}",
+                            "title": page.get("title", topic),
+                            "format": "wiki",
+                            "page_index": index,
+                            "size_bytes": 0,
+                        },
+                    )
+                )
+
+            if not documents:
+                raise ValueError(f"Keine Wikipedia-Ergebnisse fuer '{topic}' gefunden.")
+
+            cache_path = _wikipedia_cache_path(topic, language)
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(
+                json.dumps(
+                    [
+                        {"page_content": doc.page_content, "metadata": doc.metadata}
+                        for doc in documents
+                    ],
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            return documents
+        except requests.exceptions.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            last_error = exc
+            if status == 429 and attempt < 2:
+                time.sleep(2 ** attempt)
+                continue
+            raise
+        except (requests.exceptions.RequestException, ValueError, TypeError) as exc:
+            last_error = exc
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+                continue
+            raise
+
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError(f"Wikipedia-Ladung fuer '{topic}' fehlgeschlagen.")
+
+
 def _load_wikipedia(
     topic: str,
     *,
@@ -315,13 +516,33 @@ def _load_wikipedia(
     (WikipediaLoader,) = _import_or_die(
         "langchain_community.document_loaders", ["WikipediaLoader"], "wikipedia"
     )
+    import wikipedia
+
+    wikipedia.set_user_agent(
+        os.getenv("WIKIPEDIA_USER_AGENT", "rag-project/0.1.0 (Wikipedia loader)")
+    )
     _emit(on_event, f"[wikipedia] {topic} (Sprache {language}, max {max_docs})")
     kwargs: dict[str, object] = {"lang": language, "load_max_docs": max_docs}
     if query:
         kwargs["query"] = query
     else:
         kwargs["query"] = topic
-    return WikipediaLoader(**kwargs).load()
+    try:
+        documents = WikipediaLoader(**kwargs).load()
+        cache_path = _wikipedia_cache_path(topic, language)
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(
+            json.dumps(
+                [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in documents],
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        return documents
+    except Exception as exc:
+        if isinstance(exc, (requests.exceptions.JSONDecodeError, ValueError)):
+            return _load_wikipedia_direct(topic, language=language, max_docs=max_docs)
+        raise
 
 
 def _load_remote_csv(url: str, on_event: EventHook | None) -> list[Document]:
@@ -350,7 +571,7 @@ def load_document(
     Die Art der Quelle entscheidet den Loader:
 
         Datei      Endung bestimmt das Format (siehe :func:`detect_format`)
-        URL        Webseite als Text
+        URL        Webseite als Text oder PDF-Dokument
         wikipedia: Artikel zu einem Suchbegriff
         csv:       entfernte CSV-Datei ueber einen URL-Parameter
 
@@ -393,10 +614,14 @@ def load_document(
 
     elif kind == "url":
         url = str(path).strip()
-        documents = _load_url(url, on_event)
         source_label = url
-        fmt = "web"
-        size_bytes = 0
+        if _is_pdf_url(url):
+            documents, size_bytes = _load_remote_pdf(url, on_event)
+            fmt = "pdf"
+        else:
+            documents = _load_url(url, on_event)
+            fmt = "web"
+            size_bytes = 0
 
     else:
         source = Path(path).expanduser()
@@ -420,13 +645,18 @@ def load_document(
 
         source_label = str(source.resolve())
 
+    if kind == "url" and fmt == "pdf":
+        file_name = Path(urlsplit(source_label).path).name
+    elif fmt not in {"web", "wiki", "csv"}:
+        file_name = Path(source_label).name
+    else:
+        file_name = source_label
+
     for index, doc in enumerate(documents):
         doc.metadata.update(
             {
                 "source": source_label,
-                "file_name": Path(source_label).name
-                if fmt not in {"web", "wiki", "csv"}
-                else source_label,
+                "file_name": file_name,
                 "format": fmt,
                 "size_bytes": size_bytes,
                 "page_index": index,
