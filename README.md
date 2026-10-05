@@ -6,32 +6,47 @@ Ein einfaches Python-Projekt für Retrieval-Augmented Generation (RAG)-Experimen
 
 ```text
 RAG-projects/
-├── .venv/                          # virtuelle Python-Umgebung
+├── .env                            # lokale Umgebungsvariablen
+├── .git/                          # Git-Repository-Informationen
+├── .gitignore                     # Git-Ignore-Dateien
+├── .pytest_cache/                 # Pytest-Cache
+├── .venv/                         # virtuelle Python-Umgebung
+├── coverage.json                  # Coverage-Metadaten
 ├── docs/
-│   └── handbuch.txt               # Projekt-/Nutzungsdokumentation
+│   └── handbuch.txt              # Projekt-/Nutzungsdokumentation
 ├── documents/                     # Eingabedokumente oder Beispiel-Daten
-├── htmlcov/                       # Coverage-HTML-Berichte
+├── htmlcov/                      # Coverage-HTML-Berichte
 │   ├── index.html
 │   ├── status.json
 │   └── ...
 ├── scratch/
-│   └── clean.txt                  # temporäre oder explorative Dateien
+│   └── clean.txt                 # temporäre oder explorative Dateien
 ├── src/
 │   └── rag_project/
-│       ├── __init__.py            # Paketinitialisierung
-│       ├── chunking.py            # Chunking-Logik
-│       ├── cleaning.py            # Bereinigung und Vorverarbeitung
-│       ├── config.py              # Konfiguration und Einstellungen
-│       ├── loading.py             # Laden von Daten/Modellen
-│       ├── main.py                # Einstiegspunkt des Projekts
-│       ├── main_chatbot.py        # Chatbot-Skripte
-│       ├── main_chunking.py      # Chunking-Utilities
-│       ├── main_cleaning.py      # Bereinigungs-Utilities
-│       ├── main_loading.py        # Lade-Utilities
-│       ├── math_utils.py          # mathematische Hilfsfunktionen
-│       ├── models.py              # Datenmodelle
-│       ├── paths.py               # Pfad- und Dateistrukturlogik
-│       ├── providers.py           # Provider-/API-Integrationen
+│       ├── __init__.py
+│       ├── app/
+│       │   ├── __init__.py
+│       │   ├── main.py
+│       │   ├── main_chatbot.py
+│       │   ├── main_chunking.py
+│       │   ├── main_cleaning.py
+│       │   └── main_loading.py
+│       ├── core/
+│       │   ├── __init__.py
+│       │   ├── config.py
+│       │   ├── models.py
+│       │   └── paths.py
+│       ├── llm/
+│       │   ├── __init__.py
+│       │   └── providers.py
+│       ├── pipeline/
+│       │   ├── __init__.py
+│       │   ├── chunking.py
+│       │   ├── cleaning.py
+│       │   └── loading.py
+│       ├── utils/
+│       │   ├── __init__.py
+│       │   └── math_utils.py
 │       └── ...
 ├── tests/
 │   ├── __init__.py
@@ -40,12 +55,10 @@ RAG-projects/
 │   ├── test_main.py
 │   ├── test_paths.py
 │   └── ...
-├── coverage.json                  # Coverage-Metadaten
-├── pyproject.toml                 # Projektkonfiguration und Abhängigkeiten
-├── README.md                      # Projektbeschreibung
-├── uv.lock                        # Lock-Datei für die Abhängigkeitsverwaltung
-├── .gitignore                     # Git-Ignore-Dateien
-└── .python-version                # optionales Python-Tooling-Setup
+├── pyproject.toml                # Projektkonfiguration und Abhängigkeiten
+├── README.md                     # Projektbeschreibung
+├── uv.lock                       # Lock-Datei für die Abhängigkeitsverwaltung
+└── .python-version               # optionales Python-Tooling-Setup
 ```
 
 ## Source-Ordner
