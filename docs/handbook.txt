@@ -1,0 +1,192 @@
+# User Handbook for the Customer Portal
+
+The customer portal bundles everything to do with your user account: sign-in,
+password management, billing, support and your personal settings. This handbook
+describes each area and the rules that apply there. The ten chapters below walk
+through the features you use most often in the portal, in the order you are
+likely to meet them.
+
+1. Signing in
+
+Access to the customer portal is protected by an email address and a personal
+password. You enter both on the sign-in page; after that the portal is fully
+available to you. For security reasons, every account is locked temporarily
+after several failed sign-in attempts, so that nobody can guess the password by
+trying. The lock lifts automatically; there is no need to notify support.
+
+- Sign-in with email address and password
+- After three failed attempts the account is locked for 15 minutes
+- The lock lifts automatically
+
+1.1 How do I recognise a lock?
+
+When an account is locked, a notice with the remaining wait time appears on the
+sign-in attempt. Wait that time out and then sign in again. If you have
+forgotten the password in the meantime, chapter 2 will help.
+
+2. Resetting your password
+
+If you no longer know your password, a "Forgot password" link is available on
+the sign-in page. After selecting the link you enter the email address stored on
+your account. The system then sends a message containing a link through which
+you can set a new password. That link is deliberately short-lived: it expires
+after 30 minutes. If the email does not arrive within a few minutes, please
+check your spam folder before starting the process again.
+
+- "Forgot password" link on the sign-in page
+- Enter the email address of the account
+- The reset link is valid for 30 minutes
+
+2.1 What happens once the link has expired?
+
+After the deadline the link leads to an error message. Simply request a new link
+through the same page; there is no limit on how often you may do so.
+
+3. Two-factor authentication
+
+Two-factor authentication secures your account further. In addition to the
+password, the portal then asks for a second proof that an attacker cannot simply
+read off. The feature is enabled in the account settings. The options are
+authenticator apps on your smartphone and one-time codes sent by email. Setting
+up an authenticator app is considered the safer variant, because the code never
+leaves the device.
+
+- Enabled in the account settings
+- Authenticator apps and one-time codes by email are supported
+- Recommendation: use an authenticator app
+
+3.1 What if the second device is lost?
+
+If the smartphone is lost, signing in is not possible at first. In that case
+contact support, who reset the two-factor authentication after an identity
+check.
+
+4. Invoices
+
+You will find all invoices for your contract in the "Billing" menu. They are
+available there to download as PDF files, so that you can save, print or pass
+them on to your accounting department. Invoices remain available in the customer
+portal for five years. Download important receipts in good time if you want to
+keep them longer.
+
+- "Billing" menu
+- Download as a PDF file
+- Retention in the portal: five years
+
+4.1 Can I still find older invoices?
+
+After the five years have passed, invoices are removed from the portal. If you
+need an older receipt, support can usually supply it for a processing fee.
+
+5. Support
+
+Support is there to help with questions and faults. It is reachable Monday to
+Friday from 08:00 to 18:00. The easiest way to submit a request is through the
+contact form in the customer portal; that way your account details are already
+on file and processing is faster. Requests outside service hours are handled on
+the next working day.
+
+- Service hours: Monday to Friday, 08:00 to 18:00
+- Contact form in the customer portal
+- Requests outside those hours are handled on the next working day
+
+5.1 Which details help with a request?
+
+Please state your customer number, the area concerned and a short description in
+the form. Screenshots speed up the resolution of technical problems.
+
+6. Editing your user profile
+
+You maintain your personal details in the "My profile" menu. There you can
+change your name, phone number and preferred language. The preferred language
+determines the language in which you receive notifications and notices from the
+portal. For security reasons a change of email address does not take effect
+immediately: the system sends a confirmation link to the new address, valid for
+24 hours. Only after confirmation is the change applied.
+
+6.1 Why is the email address confirmed separately?
+
+The email address serves both as your sign-in name and as the recipient of
+security notices. Confirmation makes sure the address really belongs to you and
+that a typo has not addressed someone else's mailbox.
+
+7. Notifications
+
+In the "Notifications" menu you decide which messages you want to receive. The
+options are email notifications and notices inside the portal; both channels can
+be configured independently of each other. Security-relevant messages, for
+instance about sign-ins or password changes, cannot be fully disabled. This
+exception protects your account: you should notice if somebody else tries to
+gain access to it.
+
+- Choice between email and portal notifications
+- Both channels configurable independently
+- Security-relevant messages cannot be fully disabled
+
+7.1 What counts as a security-relevant message?
+
+This includes notices about sign-ins from new devices, about password and email
+changes, and about account locks. These messages always reach you through the
+contact channel on file.
+
+8. Uploading documents
+
+In the "Documents" area you can store your own files and make them available to
+support or case handlers. The formats PDF, PNG and JPG are supported; the
+maximum file size is 10 MB. Please split larger files or convert them into a
+more compact PDF. Uploaded documents can be deleted again within 30 days. After
+that the system removes them automatically.
+
+- Formats: PDF, PNG and JPG
+- Maximum file size: 10 MB
+- Deletion possible within 30 days
+
+8.1 Why is my document not accepted?
+
+It is usually the file size or the format. Check the details above the file
+picker; for a different format, convert the file first, for instance with a PDF
+export from your word processor.
+
+9. Deactivating your user account
+
+If you no longer wish to use the portal, the account can be deactivated under
+"Account settings". After deactivation signing in is no longer possible, but the
+stored data is retained at first. Within 14 days support can restore the account
+if you change your mind. Once that period has passed the account is deleted for
+good; restoration is then no longer possible.
+
+- Deactivation under "Account settings"
+- No sign-in after deactivation
+- Restoration by support within 14 days
+- After that, final deletion
+
+9.1 What happens to my invoices when the account is deleted?
+
+Deleting the account for good also removes access to the invoices stored in the
+portal. Download receipts you still need beforehand.
+
+10. Data protection and session duration
+
+The portal ends a session automatically after 20 minutes without activity. This
+protection prevents an unattended computer from leaving access open. If you work
+on a public or shared device, sign out manually as well. You can export your
+personal data in the data protection area. Depending on the volume of stored
+details, producing the export can take up to 24 hours; you will be notified as
+soon as the data is ready.
+
+- Automatic sign-out after 20 minutes without activity
+- Data export available in the data protection area
+- Producing the export takes up to 24 hours
+
+10.1 For which reasons is a session ended?
+
+Beyond inactivity, a session ends when you sign out, when the browser is closed
+in some configurations, and on a password change. In every case signing in again
+is required.
+
+Glossary
+
+- Customer portal: the web application in which you manage your account.
+- Session: the period between signing in and signing out.
+- Two-factor authentication: signing in with a password and a second proof.
+- Authenticator app: a program on your smartphone that generates one-time codes.

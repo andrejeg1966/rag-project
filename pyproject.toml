@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "langchain>=0.3.27",
     "langchain-openai>=0.3.0",
+    "langchain-openrouter>=0.1.0",
     "langchain-community>=0.3.27",
     "langchain-qdrant>=0.1.0",
     "openai>=1.60.0",
@@ -33,6 +34,7 @@ chatbot = "rag_project.app.main_chatbot:main"
 cleaning = "rag_project.app.main_cleaning:main"
 loading = "rag_project.app.main_loading:main"
 chunking = "rag_project.app.main_chunking:main"
+rag = "rag_project.app.rag_app:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

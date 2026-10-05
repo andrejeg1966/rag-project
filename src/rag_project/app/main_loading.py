@@ -118,6 +118,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--write-jsonl", metavar="DATEI",
         help="geladene Dokumente als JSONL speichern (reproduzierbarer Index)",
     )
+    parser.add_argument(
+        "--write", metavar="DATEI",
+        help="Inhalte der geladenen Dokumente als Textdatei speichern",
+    )
     return parser
 
 
@@ -226,6 +230,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"\nGeschrieben: {written} "
             f"({written.stat().st_size} Bytes, {len(documents)} Dokument(e))"
         )
+
+    if args.write:
+        target = Path(args.write)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            "\n\n".join(document.page_content for document in documents),
+            encoding="utf-8",
+        )
+        print(f"\nGeschrieben: {target} ({target.stat().st_size} Bytes)")
 
     if args.quiet or args.preview <= 0 or not documents:
         return 0

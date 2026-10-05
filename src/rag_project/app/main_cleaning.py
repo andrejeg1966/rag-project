@@ -31,6 +31,9 @@ from rag_project.core.paths import (
     resolve_documents,
 )
 
+#: Praefix, das ein Argument als netzbasierte Quelle kennzeichnet.
+SOURCE_PREFIX = "src:"
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -39,7 +42,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "paths", nargs="*",
-        help="Quelldateien. Ohne Angabe: DOCS_DIR/DEFAULT_DOCUMENT aus der .env",
+        help="Quelldateien oder Quellen mit src:-Praefix. Ohne Angabe: "
+             "DOCS_DIR/DEFAULT_DOCUMENT aus der .env",
     )
     parser.add_argument(
         "--no-unicode", action="store_true",
@@ -77,24 +81,100 @@ def build_parser() -> argparse.ArgumentParser:
         "--write", metavar="DATEI",
         help="Bereinigten Text in dieser Datei speichern",
     )
+
+    remote = parser.add_argument_group(
+        "netzbasierte Quellen",
+        "Optionen fuer src:http..., src:wikipedia:... und src:csv:...",
+    )
+    remote.add_argument(
+        "--url", action="append", default=[], metavar="ADRESSE",
+        help="Webseite laden; mehrfach angebbar",
+    )
+    remote.add_argument(
+        "--wikipedia", action="append", default=[], metavar="THEMA",
+        help="Wikipedia-Artikel zum Thema laden; mehrfach angebbar",
+    )
+    remote.add_argument(
+        "--csv-url", action="append", default=[], metavar="ADRESSE",
+        help="entfernte CSV-Datei laden; mehrfach angebbar",
+    )
+    remote.add_argument(
+        "--wiki-lang", default="de",
+        help="Sprachversion fuer Wikipedia (Standard: de)",
+    )
+    remote.add_argument(
+        "--wiki-max-docs", type=int, default=1,
+        help="Zahl der Wikipedia-Artikel je Thema (Standard: 1)",
+    )
+    remote.add_argument(
+        "--allow-remote", action="store_true",
+        help="netzbasierte Quellen ohne Rueckfrage laden",
+    )
     return parser
+
+
+def _split_sources(arguments: Sequence[str]) -> tuple[list[str], list[str]]:
+    local: list[str] = []
+    remote: list[str] = []
+
+    for argument in arguments:
+        if argument.startswith(SOURCE_PREFIX):
+            remote.append(argument[len(SOURCE_PREFIX):].strip())
+        else:
+            local.append(argument)
+
+    return local, remote
+
+
+def _assert_remote_enabled(remote: Sequence[str], allowed: bool) -> bool:
+    if not remote or allowed:
+        return True
+
+    print(
+        f"Diese Quelle(n) werden ueber das Netz geladen ({len(remote)}):",
+        file=sys.stderr,
+    )
+    for value in remote:
+        print(f"  {value}", file=sys.stderr)
+    try:
+        answer = input("Fortfahren? [j/N] ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print("\nAbgebrochen.", file=sys.stderr)
+        return False
+    return answer in {"j", "ja", "y", "yes"}
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
-    try:
-        paths = resolve_documents(args.paths)
-    except DocumentPathError as exc:
-        print(f"Fehler: {exc}", file=sys.stderr)
+    local_arguments, prefixed_remote = _split_sources(args.paths)
+    remote_sources = list(prefixed_remote)
+    remote_sources.extend(args.url)
+    remote_sources.extend(f"wikipedia:{topic}" for topic in args.wikipedia)
+    remote_sources.extend(f"csv:{url}" for url in args.csv_url)
+
+    if not _assert_remote_enabled(remote_sources, args.allow_remote):
         return 1
 
-    if args.show_paths:
-        print(describe_paths(paths))
+    paths: list[str] = []
+    if local_arguments or not remote_sources:
+        try:
+            paths = [str(path) for path in resolve_documents(local_arguments or None)]
+        except DocumentPathError as exc:
+            print(f"Fehler: {exc}", file=sys.stderr)
+            return 1
+
+    if args.show_paths and paths:
+        print(describe_paths([Path(p) for p in paths]))
         print()
 
     try:
-        documents = load_documents(paths)
+        documents = load_documents(
+            [str(path) for path in paths] + list(remote_sources),
+            on_event=None,
+            wikipedia_language=args.wiki_lang,
+            wikipedia_max_docs=args.wiki_max_docs,
+        )
     except UnsupportedFormatError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)
         return 1

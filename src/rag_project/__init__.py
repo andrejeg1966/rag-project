@@ -31,6 +31,13 @@ from rag_project.core.models import (
     list_models,
     registry,
 )
+from rag_project.app.rag_lib import (
+    PipelineResult,
+    RagSystem,
+    create_rag_system,
+    run_pipeline,
+)
+
 from rag_project.llm.providers import (
     ClientBuildError,
     MissingCredentialsError,
@@ -65,6 +72,11 @@ __all__ = [
     "resolve_target",
     "build_llm",
     "provider_report",
+    # rag pipeline
+    "RagSystem",
+    "PipelineResult",
+    "create_rag_system",
+    "run_pipeline",
     # entry point
     "main",
     "build_parser",

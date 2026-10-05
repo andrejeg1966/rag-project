@@ -1,7 +1,16 @@
+from pathlib import Path
+
 from pydantic import SecretStr
 
-from rag_project.config import Settings
-from rag_project.paths import resolve_documents
+from rag_project.app.rag_lib import source_path
+from rag_project.core.config import Settings
+from rag_project.core.paths import resolve_documents
+
+
+def test_rag_source_path_uses_project_root_docs_dir():
+    path = source_path("de", fmt="pdf")
+    expected = Path(__file__).resolve().parents[1] / "docs" / "handbuch.pdf"
+    assert path == expected
 
 
 def test_relative_filename_falls_back_to_configured_docs_dir(tmp_path, monkeypatch):
