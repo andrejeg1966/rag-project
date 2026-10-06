@@ -4,6 +4,8 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+.coverage
+uv.lock
 
 # Secrets
 .env
