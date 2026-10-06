@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import pytest
 
-from rag_project.config import ChatProvider, Settings, describe_settings
-from rag_project.models import (
+from rag_project.core.config import ChatProvider, Settings, describe_settings
+from rag_project.core.models import (
     ModelKind,
     ModelRegistry,
     UnknownModelError,
     registry,
 )
-from rag_project.providers import ProviderError, resolve_target
+from rag_project.llm.providers import ProviderError, resolve_target
 
 
 # ---------------------------------------------------------------------------

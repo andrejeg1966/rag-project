@@ -1,4 +1,4 @@
-from rag_project import main_chatbot
+from rag_project.app import main_chatbot
 
 
 def test_chatbot_builds_streaming_client_on_init_and_system_reset(monkeypatch):
