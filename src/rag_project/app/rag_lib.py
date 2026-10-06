@@ -19,8 +19,10 @@ Keine Evaluierung: keine Judges, keine Metriken.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from textwrap import wrap
 from typing import Any, Iterator
 
 from dotenv import load_dotenv
@@ -60,9 +62,6 @@ from rag_project.pipeline.loading import (
     format_load_report,
     load_documents,
 )
-
-#: Formatierer aus dem Begleitmodul der RAG-Evaluation.
-from rag_project.app.rag_utils import format_text, print_wrapped  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Pfade und Sprache
@@ -318,7 +317,7 @@ def build_vectorstore(
         "retrieval_mode": retrieval_mode,
     }
     try:
-        if retrieval_mode is RetrievalMode.HYBRID:
+        if retrieval_mode in (RetrievalMode.SPARSE, RetrievalMode.HYBRID):
             return QdrantVectorStore.from_documents(
                 sparse_embedding=FastEmbedSparse(model_name=SPARSE_MODEL),
                 **common,
@@ -353,6 +352,59 @@ def format_docs(documents) -> str:
         origin += f": {title}]"
         blocks.append(f"{origin}\n{doc.page_content}")
     return "\n\n".join(blocks)
+
+
+#: A line that starts a bullet ("- ", "* ", "+ ", "• ") or numbered ("1. ",
+#: "2) ") list item, with optional leading indentation.
+_LIST_ITEM_RE = re.compile(r"^(\s*)([-*+•]\s+|\d{1,3}[.)]\s+)")
+
+
+def format_text(text, width=80, indent=0):
+    """Wrap long lines while preserving their original structure.
+
+    Plain ``print`` can produce lines that are too long for slides. This helper
+    wraps line by line so blank lines, lists, fenced code blocks and tables keep
+    their structure.
+    """
+    pad = " " * indent
+    formatted_lines = []
+    in_code_block = False
+    for line in str(text).splitlines():
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_code_block = not in_code_block
+            formatted_lines.append(pad + line.rstrip())
+            continue
+        if in_code_block or stripped.startswith("|"):
+            formatted_lines.append(pad + line.rstrip())
+            continue
+        if not stripped:
+            formatted_lines.append("")
+            continue
+        match = _LIST_ITEM_RE.match(line)
+        if match:
+            first = pad + match.group(1) + match.group(2)
+            hanging = pad + match.group(1) + " " * len(match.group(2))
+            body = line[match.end() :]
+        else:
+            leading_ws = line[: len(line) - len(line.lstrip())]
+            first = hanging = pad + leading_ws
+            body = stripped
+        wrapped = wrap(
+            body,
+            width=width,
+            initial_indent=first,
+            subsequent_indent=hanging,
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        formatted_lines.extend(wrapped or [first.rstrip()])
+    return "\n".join(formatted_lines)
+
+
+def print_wrapped(text, width=80, indent=0):
+    """Print text via :func:`format_text` while preserving its structure."""
+    print(format_text(text, width=width, indent=indent))
 
 
 def build_retriever(store: QdrantVectorStore, k: int = DEFAULT_K):

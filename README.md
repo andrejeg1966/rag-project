@@ -31,8 +31,8 @@ RAG-projects/
         │   ├── main_cleaning.py    # CLI: bereinigen
         │   ├── main_loading.py     # CLI: laden
         │   ├── rag_app.py          # CLI der RAG-Anwendung
-        │   ├── rag_lib.py          # Index, Retriever, Kette, Sprachwahl
-        │   └── rag_utils.py        # format_text, print_wrapped
+        │   ├── rag_eval.py         # spätere RAG-Evaluation und LLM-Judges
+        │   └── rag_lib.py          # Index, Retriever, Kette, Sprachwahl
         ├── core/
         │   ├── __init__.py
         │   ├── config.py           # Settings, API-Keys, Pfade

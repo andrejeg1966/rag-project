@@ -270,6 +270,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="eine Frage beantworten")
     action.add_argument("--compare", action="store_true",
                         help="alle Testfragen in beiden Suchmodi beantworten")
+    action.add_argument("--print-wrapped", metavar="TEXT",
+                        help="print_wrapped mit einem Testtext ausfuehren")
 
     parser.add_argument("--language", choices=list(LANGUAGES),
                         default=DEFAULT_LANGUAGE,
@@ -360,6 +362,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         target.write_text(chunks_to_markdown(pipeline.chunks), encoding="utf-8")
         emit(f"{target} ({target.stat().st_size} Bytes, "
              f"{len(pipeline.chunks)} Chunks)")
+        return 0
+    if args.print_wrapped is not None:
+        rag_lib.print_wrapped(args.print_wrapped, width=60)
         return 0
 
     # Ab hier braucht es Embeddings -- also einen Key und das Netz.
