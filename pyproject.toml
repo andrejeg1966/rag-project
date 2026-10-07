@@ -26,6 +26,7 @@ dependencies = [
     "langchainhub>=0.1.0",
     "pypdf>=6.19.0",
     "wikipedia>=1.4.0",
+    "gradio>=6.12.0",
 ]
 
 [project.scripts]
@@ -35,6 +36,7 @@ cleaning = "rag_project.app.main_cleaning:main"
 loading = "rag_project.app.main_loading:main"
 chunking = "rag_project.app.main_chunking:main"
 rag = "rag_project.app.rag_app:main"
+ui-chatbot = "rag_project.app.ui_chatbot:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

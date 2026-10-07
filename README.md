@@ -32,7 +32,8 @@ RAG-projects/
         │   ├── main_loading.py     # CLI: laden
         │   ├── rag_app.py          # CLI der RAG-Anwendung
         │   ├── rag_eval.py         # spätere RAG-Evaluation und LLM-Judges
-        │   └── rag_lib.py          # Index, Retriever, Kette, Sprachwahl
+        │   ├── rag_lib.py          # Index, Retriever, Kette, Sprachwahl
+        │   └── ui_chatbot.py       # Gradio-Web-Chatbot mit Streaming-Antworten
         ├── core/
         │   ├── __init__.py
         │   ├── config.py           # Settings, API-Keys, Pfade
@@ -59,6 +60,7 @@ tests/
 ├── test_main_loading.py            # Schreiben geladener Dokumente
 ├── test_paths.py                   # Pfadaufloesung
 ├── test_remote_pdf_loader.py       # PDF von einer Adresse
+├── test_ui_chatbot.py              # Gradio-History- und Modelltests
 └── test_wikipedia_loader.py        # Wikipedia-Loader
 ```
 
@@ -100,7 +102,7 @@ pytest
 ## Projekt-Setup
 
 1. Repository klonen
-2. Abhängigkeiten installieren:
+1. Abhängigkeiten installieren:
 
 ```bash
 uv sync
@@ -112,7 +114,7 @@ Für das Development-Setup mit Testwerkzeugen, z. B. `pytest`, `coverage` und `p
 uv sync --group dev
 ```
 
-3. Projekt-Umgebung aktivieren (optional):
+1. Projekt-Umgebung aktivieren (optional):
 
 ```bash
 source .venv/bin/activate
@@ -136,6 +138,40 @@ Das Projekt definiert mehrere Einstiegspunkte in `pyproject.toml`:
 | `uv run cleaning` | `app/main_cleaning.py` | Text bereinigen |
 | `uv run chunking` | `app/main_chunking.py` | Dokumente chunken |
 | `uv run rag` | `app/rag_app.py` | vollständige RAG-Anwendung |
+| `uv run ui-chatbot` | `app/ui_chatbot.py` | Web-Chatbot mit Gradio |
+
+## UI-Chatbot
+
+Vor dem Start müssen die Abhängigkeiten installiert sein:
+
+```bash
+uv sync
+```
+
+Den Web-Chatbot starten:
+
+```bash
+uv run ui-chatbot
+```
+
+Alternativ direkt als Python-Modul ausführen:
+
+```bash
+uv run python -m rag_project.app.ui_chatbot
+```
+
+Danach:
+
+1. Einen Modellanbieter und ein Modell über die Einstellungen auswählen.
+2. Eine Frage im Chatfenster eingeben.
+3. Mit **Reset Chat** den Verlauf löschen und eine neue Konversation beginnen.
+4. Die Anwendung mit `Ctrl+C` im Terminal beenden.
+
+Für die Nutzung eines LLM-Anbieters müssen dessen Zugangsdaten in der `.env`-Datei bzw. in der aktiven Umgebungs-Konfiguration hinterlegt sein. Die verfügbaren Einstellungen können über den Projektbefehl geprüft werden:
+
+```bash
+uv run rag-project --check
+```
 
 Zur RAG-Anwendung mit Konfigurationsausgabe:
 
