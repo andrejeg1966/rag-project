@@ -33,7 +33,8 @@ RAG-projects/
         │   ├── rag_app.py          # CLI der RAG-Anwendung
         │   ├── rag_eval.py         # spätere RAG-Evaluation und LLM-Judges
         │   ├── rag_lib.py          # Index, Retriever, Kette, Sprachwahl
-        │   └── ui_chatbot.py       # Gradio-Web-Chatbot mit Streaming-Antworten
+        │   ├── ui_chatbot.py       # Gradio-Web-Chatbot mit Streaming-Antworten
+        │   └── ui_rag.py           # Gradio-Web-RAG-Chatbot mit Index und Retrieval
         ├── core/
         │   ├── __init__.py
         │   ├── config.py           # Settings, API-Keys, Pfade
@@ -139,6 +140,7 @@ Das Projekt definiert mehrere Einstiegspunkte in `pyproject.toml`:
 | `uv run chunking` | `app/main_chunking.py` | Dokumente chunken |
 | `uv run rag` | `app/rag_app.py` | vollständige RAG-Anwendung |
 | `uv run ui-chatbot` | `app/ui_chatbot.py` | Web-Chatbot mit Gradio |
+| `uv run ui-rag` | `app/ui_rag.py` | Web-RAG-Chatbot mit Gradio |
 
 ## UI-Chatbot
 
@@ -158,6 +160,18 @@ Alternativ direkt als Python-Modul ausführen:
 
 ```bash
 uv run python -m rag_project.app.ui_chatbot
+```
+
+Den Web-RAG-Chatbot starten:
+
+```bash
+uv run ui-rag
+```
+
+Alternativ direkt als Python-Modul ausführen:
+
+```bash
+uv run python -m rag_project.app.ui_rag
 ```
 
 Danach:
