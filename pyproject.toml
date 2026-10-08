@@ -37,6 +37,7 @@ loading = "rag_project.app.main_loading:main"
 chunking = "rag_project.app.main_chunking:main"
 rag = "rag_project.app.rag_app:main"
 ui-chatbot = "rag_project.app.ui_chatbot:main"
+ui-rag = "rag_project.app.ui_rag:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
