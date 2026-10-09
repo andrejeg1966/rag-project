@@ -1,6 +1,6 @@
 import wikipedia
 
-from rag_project.pipeline import loading
+from rag_project.pipeline import wikipedia_load
 
 
 def test_wikipedia_loader_sets_configured_user_agent(monkeypatch):
@@ -23,12 +23,12 @@ def test_wikipedia_loader_sets_configured_user_agent(monkeypatch):
         lambda value: observed.update(user_agent=value),
     )
     monkeypatch.setattr(
-        loading,
+        wikipedia_load,
         "_import_or_die",
         lambda *_args: (FakeWikipediaLoader,),
     )
 
-    assert loading._load_wikipedia("Künstliche Intelligenz") == []
+    assert wikipedia_load.load_wikipedia("Künstliche Intelligenz") == []
     assert observed["user_agent"] == "rag-project-test/1.0 (contact: test@example.com)"
     assert observed["loader_kwargs"] == {
         "lang": "de",

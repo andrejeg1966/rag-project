@@ -1,4 +1,4 @@
-"""Dokumentenladen fuer die RAG-Pipeline.
+﻿"""Dokumentenladen fuer die RAG-Pipeline.
 
 Reine Bibliothek -- keine CLI, kein ``argparse``. Die Ausfuehrung liegt in
 :mod:`rag_project.app.main_loading`.
@@ -17,14 +17,13 @@ Unterstuetzte Quellen:
 
     Dateibasiert (Endung entscheidet):
         .txt .rst        TextLoader
-        .md .markdown    UnstructuredMarkdownLoader
-        .csv             CSVLoader
         .pdf             PyPDFLoader
 
     Netzbasiert (explizit anzugeben, keine Endung):
         http:// https:// WebBaseLoader (HTML) oder PyPDFLoader (PDF)
-        wikipedia:...    WikipediaLoader
-        csv:...          CSVLoader fuer entfernte Dateien
+
+CSV, Markdown und Wikipedia werden hier nicht geladen; dafuer gibt es die
+Module ``csv_load``, ``markdown_load`` und ``wikipedia_load`` mit eigenen CLIs.
 
 Die netzbasierten Loader brauchen ``langchain-community`` und ziehen je nach
 Ziel weitere Pakete (etwa ``beautifulsoup4`` fuer HTML). Ein fehlendes Paket
@@ -37,16 +36,13 @@ Index sollte das Ergebnis einmal geladen und als Datei abgelegt werden.
 
 from __future__ import annotations
 
-import csv
-import io
 import json
 import os
 import tempfile
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Iterable, Sequence
-from urllib.parse import quote, unquote, urlsplit
+from urllib.parse import unquote, urlsplit
 
 import requests
 
@@ -63,19 +59,13 @@ from langchain_core.documents import Document
 
 TEXT_SUFFIXES: frozenset[str] = frozenset({".txt", ".rst"})
 PDF_SUFFIXES: frozenset[str] = frozenset({".pdf"})
-MARKDOWN_SUFFIXES: frozenset[str] = frozenset({".md", ".markdown"})
-CSV_SUFFIXES: frozenset[str] = frozenset({".csv"})
 
 #: Alle Formate, die sich an der Endung erkennen lassen.
-FILE_SUFFIXES: frozenset[str] = (
-    TEXT_SUFFIXES | PDF_SUFFIXES | MARKDOWN_SUFFIXES | CSV_SUFFIXES
-)
+FILE_SUFFIXES: frozenset[str] = TEXT_SUFFIXES | PDF_SUFFIXES
 
 #: Praefixe fuer netzbasierte Quellen. Sie werden *vor* der Endungspruefung
-#: ausgewertet, weil eine URL mit .csv-Endung sonst als lokale Datei gaelte.
+#: ausgewertet, weil eine URL mit .pdf-Endung sonst als lokale Datei gaelte.
 URL_PREFIXES: tuple[str, ...] = ("http://", "https://")
-WIKIPEDIA_PREFIX = "wikipedia:"
-REMOTE_CSV_PREFIX = "csv:"
 
 #: Signatur eines Ausgabe-Callbacks: bekommt eine fertige Textzeile.
 EventHook = Callable[[str], None]
@@ -172,21 +162,15 @@ def format_document_metadata(document: Document, indent: str = "  ") -> str:
 def detect_source_kind(source: str | Path) -> str:
     """Bestimmt die Art der Quelle.
 
-    :return: ``file``, ``url``, ``wikipedia`` oder ``remote_csv``.
+    :return: ``file`` oder ``url``.
 
-    Die netzbasierten Praefixe werden zuerst geprueft. Eine entfernte
-    CSV-Datei wuerde sonst wegen ihrer Endung als lokale Datei behandelt.
+    Das URL-Praefix wird zuerst geprueft. Eine entfernte PDF-Datei
+    wuerde sonst wegen ihrer Endung als lokale Datei behandelt.
     """
     if isinstance(source, Path):
         return "file"
 
-    text = str(source).strip()
-    lowered = text.lower()
-
-    if lowered.startswith(WIKIPEDIA_PREFIX):
-        return "wikipedia"
-    if lowered.startswith(REMOTE_CSV_PREFIX) and not lowered.startswith(URL_PREFIXES):
-        return "remote_csv"
+    lowered = str(source).strip().lower()
     if lowered.startswith(URL_PREFIXES):
         return "url"
     return "file"
@@ -200,16 +184,13 @@ def detect_format(path: Path) -> str:
     suffix = path.suffix.lower()
     if suffix in TEXT_SUFFIXES:
         return "text"
-    if suffix in MARKDOWN_SUFFIXES:
-        return "markdown"
-    if suffix in CSV_SUFFIXES:
-        return "csv"
     if suffix in PDF_SUFFIXES:
         return "pdf"
     raise UnsupportedFormatError(
         f"Unsupported file format: {suffix or '<keine Endung>'!r} "
         f"({path.name}). Unterstuetzt: "
-        f"{', '.join(sorted(FILE_SUFFIXES))}"
+        f"{', '.join(sorted(FILE_SUFFIXES))}. CSV, Markdown und Wikipedia "
+        f"laden csv-load, markdown-load und wikipedia-load."
     )
 
 
@@ -238,58 +219,6 @@ def _load_text_file(source: Path, encoding: str) -> list[Document]:
         str(source), encoding=encoding, autodetect_encoding=True
     )
     return loader.load()
-
-
-def _load_markdown_file(source: Path) -> list[Document]:
-    """Laedt Markdown mit dem Unstructured-Loader.
-
-    Der Loader setzt ``unstructured`` voraus; fehlt es, faellt die Funktion auf
-    den reinen Textloader zurueck. Markdown ist Text -- der Rueckfall kostet
-    nur die Absatztrennung, die Unstructured zusaetzlich liefert.
-    """
-    try:
-        (MarkdownLoader,) = _import_or_die(
-            "langchain_community.document_loaders",
-            ["UnstructuredMarkdownLoader"],
-            "unstructured",
-        )
-    except LoaderDependencyError:
-        return _load_text_file(source, encoding="utf-8")
-
-    return MarkdownLoader(str(source), mode="single").load()
-
-
-def _load_csv_file(source: Path, encoding: str) -> list[Document]:
-    """Laedt CSV mit dem LangChain-Loader, sonst mit eigenem Rueckfall.
-
-    Der Rueckfall erzeugt je Zeile ein Dokument mit einer Kopfzeile
-    ``spalte: wert`` -- dasselbe Ausgabeformat wie der Standardloader, nur
-    ohne dessen optionale Abhaengigkeiten.
-    """
-    try:
-        (CSVLoader,) = _import_or_die(
-            "langchain_community.document_loaders", ["CSVLoader"], "langchain-community"
-        )
-        return CSVLoader(str(source), encoding=encoding).load()
-    except (LoaderDependencyError, TypeError):
-        pass
-
-    text = source.read_text(encoding=encoding, errors="replace")
-    reader = csv.DictReader(io.StringIO(text))
-    fieldnames = reader.fieldnames or []
-
-    documents: list[Document] = []
-    for index, row in enumerate(reader):
-        body = "\n".join(
-            f"{name}: {(row.get(name) or '').strip()}" for name in fieldnames
-        )
-        documents.append(
-            Document(
-                page_content=body,
-                metadata={"row_index": index},
-            )
-        )
-    return documents
 
 
 def _load_url(source: str, on_event: EventHook | None) -> list[Document]:
@@ -345,226 +274,10 @@ def _load_remote_pdf(
     return documents, len(content)
 
 
-def _wikipedia_cache_path(topic: str, language: str) -> Path:
-    """Pfad zur lokalen Wikipedia-Cache-Datei fuer den Suchbegriff."""
-    slug = "".join(ch if ch.isalnum() or ch in {"-", "_"} else "_" for ch in topic)
-    return Path.cwd() / ".cache" / "wikipedia" / language / f"{slug}.json"
-
-
-def _load_wikipedia_from_cache(topic: str, language: str) -> list[Document] | None:
-    """Laedt ein bereits gecachtes Wikipedia-Ergebnis, falls vorhanden."""
-    cache_path = _wikipedia_cache_path(topic, language)
-    if not cache_path.exists():
-        return None
-
-    try:
-        payload = json.loads(cache_path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-
-    documents: list[Document] = []
-    for item in payload:
-        documents.append(
-            Document(
-                page_content=item["page_content"],
-                metadata=item.get("metadata", {}),
-            )
-        )
-    return documents or None
-
-
-def _load_wikipedia_direct(
-    topic: str,
-    *,
-    language: str = "de",
-    max_docs: int = 1,
-) -> list[Document]:
-    """Laedt Wikipedia-Artikel direkt ueber die API als robusten Fallback.
-
-    Der ``wikipedia``-Wrapper ist in manchen Umgebungen empfindlich auf leere
-    oder nicht-JSON-Antworten der API; hier nutzen wir die JSON-API mit einer
-    expliziten User-Agent-Header-Kombination und fangen nicht-JSON-Antworten
-    sauber ab. Bei HTTP 429 wird der Request mit kurzer Backoff wiederholt;
-    eine erfolgreiche Antwort wird lokal gecacht, damit weitere Runs nicht
-    erneut gegen die Rate-Limits laufen.
-    """
-    cached = _load_wikipedia_from_cache(topic, language)
-    if cached is not None:
-        return cached
-
-    user_agent = os.getenv(
-        "WIKIPEDIA_USER_AGENT", "rag-project/0.1.0 (Wikipedia loader)"
-    )
-    headers = {"User-Agent": user_agent}
-    base = f"https://{language}.wikipedia.org/w/api.php"
-
-    last_error: Exception | None = None
-    for attempt in range(3):
-        try:
-            search_params = {
-                "action": "query",
-                "list": "search",
-                "format": "json",
-                "srsearch": topic,
-                "srlimit": max_docs,
-                "srnamespace": 0,
-                "utf8": 1,
-            }
-            search_response = requests.get(
-                base,
-                params=search_params,
-                headers=headers,
-                timeout=30,
-            )
-            search_response.raise_for_status()
-            search_payload = search_response.json()
-            titles = [
-                hit["title"] for hit in search_payload.get("query", {}).get("search", [])
-            ]
-
-            if not titles:
-                titles = [topic]
-
-            extract_params = {
-                "action": "query",
-                "prop": "extracts",
-                "explaintext": 1,
-                "format": "json",
-                "redirects": 1,
-                "titles": "|".join(quote(title, safe="") for title in titles),
-                "utf8": 1,
-            }
-            extract_response = requests.get(
-                base,
-                params=extract_params,
-                headers=headers,
-                timeout=30,
-            )
-            extract_response.raise_for_status()
-            pages = extract_response.json().get("query", {}).get("pages", {})
-
-            documents: list[Document] = []
-            for index, page in enumerate(pages.values()):
-                if page.get("missing"):
-                    continue
-                content = (page.get("extract") or "").strip()
-                if not content:
-                    continue
-                documents.append(
-                    Document(
-                        page_content=content,
-                        metadata={
-                            "source": f"wikipedia:{topic}",
-                            "file_name": f"wikipedia:{topic}",
-                            "title": page.get("title", topic),
-                            "format": "wiki",
-                            "page_index": index,
-                            "size_bytes": 0,
-                        },
-                    )
-                )
-
-            if not documents:
-                raise ValueError(f"Keine Wikipedia-Ergebnisse fuer '{topic}' gefunden.")
-
-            cache_path = _wikipedia_cache_path(topic, language)
-            cache_path.parent.mkdir(parents=True, exist_ok=True)
-            cache_path.write_text(
-                json.dumps(
-                    [
-                        {"page_content": doc.page_content, "metadata": doc.metadata}
-                        for doc in documents
-                    ],
-                    ensure_ascii=False,
-                ),
-                encoding="utf-8",
-            )
-            return documents
-        except requests.exceptions.HTTPError as exc:
-            status = exc.response.status_code if exc.response is not None else None
-            last_error = exc
-            if status == 429 and attempt < 2:
-                time.sleep(2 ** attempt)
-                continue
-            raise
-        except (requests.exceptions.RequestException, ValueError, TypeError) as exc:
-            last_error = exc
-            if attempt < 2:
-                time.sleep(2 ** attempt)
-                continue
-            raise
-
-    if last_error is not None:
-        raise last_error
-    raise RuntimeError(f"Wikipedia-Ladung fuer '{topic}' fehlgeschlagen.")
-
-
-def _load_wikipedia(
-    topic: str,
-    *,
-    language: str = "de",
-    query: str | None = None,
-    max_docs: int = 1,
-    on_event: EventHook | None = None,
-) -> list[Document]:
-    """Laedt Artikel aus Wikipedia.
-
-    :param topic: Suchbegriff, also der Teil hinter dem Praefix.
-    :param query: Freitext-Suche statt direkter Artikelabruf.
-    :param max_docs: Zahl der zurueckzugebenden Artikel.
-    """
-    (WikipediaLoader,) = _import_or_die(
-        "langchain_community.document_loaders", ["WikipediaLoader"], "wikipedia"
-    )
-    import wikipedia
-
-    wikipedia.set_user_agent(
-        os.getenv("WIKIPEDIA_USER_AGENT", "rag-project/0.1.0 (Wikipedia loader)")
-    )
-    _emit(on_event, f"[wikipedia] {topic} (Sprache {language}, max {max_docs})")
-    kwargs: dict[str, object] = {"lang": language, "load_max_docs": max_docs}
-    if query:
-        kwargs["query"] = query
-    else:
-        kwargs["query"] = topic
-    try:
-        documents = WikipediaLoader(**kwargs).load()
-        cache_path = _wikipedia_cache_path(topic, language)
-        cache_path.parent.mkdir(parents=True, exist_ok=True)
-        cache_path.write_text(
-            json.dumps(
-                [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in documents],
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-        return documents
-    except Exception as exc:
-        if isinstance(exc, (requests.exceptions.JSONDecodeError, ValueError)):
-            return _load_wikipedia_direct(topic, language=language, max_docs=max_docs)
-        raise
-
-
-def _load_remote_csv(url: str, on_event: EventHook | None) -> list[Document]:
-    """Laedt eine entfernte CSV-Datei ueber HTTP.
-
-    Der Inhalt wird zuerst geholt und dann wie eine lokale Datei gelesen --
-    so bleibt genau eine CSV-Auswertung im Modul.
-    """
-    (CSVLoader,) = _import_or_die(
-        "langchain_community.document_loaders", ["CSVLoader"], "langchain-community"
-    )
-    _emit(on_event, f"[netz]  {url}")
-    return CSVLoader(url).load()
-
-
 def load_document(
     path: str | Path,
     encoding: str = "utf-8",
     on_event: EventHook | None = None,
-    *,
-    wikipedia_language: str = "de",
-    wikipedia_max_docs: int = 1,
 ) -> list[Document]:
     """Laedt eine einzelne Quelle als Liste von ``Document``-Objekten.
 
@@ -572,47 +285,18 @@ def load_document(
 
         Datei      Endung bestimmt das Format (siehe :func:`detect_format`)
         URL        Webseite als Text oder PDF-Dokument
-        wikipedia: Artikel zu einem Suchbegriff
-        csv:       entfernte CSV-Datei ueber einen URL-Parameter
 
-    :param path: Pfad, URL oder Quellpraefix.
-    :param encoding: Kodierung fuer Text- und CSV-Dateien.
+    :param path: Pfad oder URL.
+    :param encoding: Kodierung fuer Textdateien.
     :param on_event: optionaler Callback, bekommt Fortschrittszeilen.
 
     :raises SourceNotFoundError: wenn eine lokale Datei fehlt.
-    :raises UnsupportedFormatError: wenn Format oder Praefix unbekannt sind.
+    :raises UnsupportedFormatError: wenn das Format unbekannt ist.
     :raises LoaderDependencyError: wenn ein noetiges Paket fehlt.
     """
     kind = detect_source_kind(path)
 
-    if kind == "wikipedia":
-        topic = str(path).strip()[len(WIKIPEDIA_PREFIX):].strip()
-        if not topic:
-            raise UnsupportedFormatError(
-                "Wikipedia-Quelle ohne Suchbegriff: 'wikipedia:<Thema>' erwartet."
-            )
-        documents = _load_wikipedia(
-            topic,
-            language=wikipedia_language,
-            max_docs=wikipedia_max_docs,
-            on_event=on_event,
-        )
-        source_label = f"wikipedia:{topic}"
-        fmt = "wiki"
-        size_bytes = 0
-
-    elif kind == "remote_csv":
-        url = str(path).strip()[len(REMOTE_CSV_PREFIX):].strip()
-        if not url:
-            raise UnsupportedFormatError(
-                "CSV-Quelle ohne Adresse: 'csv:<url>' erwartet."
-            )
-        documents = _load_remote_csv(url, on_event)
-        source_label = url
-        fmt = "csv"
-        size_bytes = 0
-
-    elif kind == "url":
+    if kind == "url":
         url = str(path).strip()
         source_label = url
         if _is_pdf_url(url):
@@ -634,10 +318,6 @@ def load_document(
 
         if fmt == "pdf":
             documents = PyPDFLoader(str(source)).load()
-        elif fmt == "markdown":
-            documents = _load_markdown_file(source)
-        elif fmt == "csv":
-            documents = _load_csv_file(source, encoding)
         else:
             # autodetect_encoding faengt Dateien ab, die nicht UTF-8 sind --
             # ein echtes Problem bei Handbuechern aus Windows-Programmen.
@@ -647,7 +327,7 @@ def load_document(
 
     if kind == "url" and fmt == "pdf":
         file_name = Path(urlsplit(source_label).path).name
-    elif fmt not in {"web", "wiki", "csv"}:
+    elif fmt != "web":
         file_name = Path(source_label).name
     else:
         file_name = source_label
@@ -764,12 +444,8 @@ def from_jsonl(source: str | Path) -> list[Document]:
 __all__ = [
     "TEXT_SUFFIXES",
     "PDF_SUFFIXES",
-    "MARKDOWN_SUFFIXES",
-    "CSV_SUFFIXES",
     "FILE_SUFFIXES",
     "URL_PREFIXES",
-    "WIKIPEDIA_PREFIX",
-    "REMOTE_CSV_PREFIX",
     "EventHook",
     "UnsupportedFormatError",
     "SourceNotFoundError",

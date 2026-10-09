@@ -14,8 +14,9 @@ Praefix ``src:`` erkannt und nicht ueber :mod:`rag_project.paths` aufgeloest
 -- eine URL ist kein Pfad:
 
     src:https://example.com/handbuch    Webseite als Text
-    src:wikipedia:RAG                   Wikipedia-Artikel
-    src:csv:https://example.com/d.csv   entfernte CSV-Datei
+
+CSV, Markdown und Wikipedia laden die eigenen Befehle csv-load,
+markdown-load und wikipedia-load.
 
 Weil netzbasierte Inhalte nicht reproduzierbar sind, empfiehlt sich der
 Schalter ``--load-jsonl``: Er legt den Ladesatz ab, bevor bereinigt und
@@ -106,26 +107,11 @@ def build_parser() -> argparse.ArgumentParser:
     # --- netzbasierte Quellen ------------------------------------------------
     remote = parser.add_argument_group(
         "netzbasierte Quellen",
-        "Optionen fuer src:http..., src:wikipedia:... und src:csv:...",
+        "Optionen fuer src:http...",
     )
     remote.add_argument(
         "--url", action="append", default=[], metavar="ADRESSE",
         help="Webseite laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wikipedia", action="append", default=[], metavar="THEMA",
-        help="Wikipedia-Artikel zum Thema laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--csv-url", action="append", default=[], metavar="ADRESSE",
-        help="entfernte CSV-Datei laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wiki-lang", default="de", help="Sprachversion fuer Wikipedia (Standard: de)"
-    )
-    remote.add_argument(
-        "--wiki-max-docs", type=int, default=1,
-        help="Zahl der Wikipedia-Artikel je Thema (Standard: 1)",
     )
     remote.add_argument(
         "--allow-remote", action="store_true",
@@ -186,8 +172,6 @@ def _collect_remote_sources(args: argparse.Namespace, positional: Sequence[str])
     """Sammelt alle netzbasierten Quellen aus Praefixen und Optionen."""
     remote = list(positional)
     remote.extend(args.url)
-    remote.extend(f"wikipedia:{topic}" for topic in args.wikipedia)
-    remote.extend(f"csv:{url}" for url in args.csv_url)
     return remote
 
 
@@ -198,7 +182,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.from_jsonl:
         # Ein Ladesatz umgeht Laden und Netz vollstaendig. Quellen anzugeben
         # waere widerspruechlich -- die Datei entscheidet den Inhalt.
-        if args.paths or args.url or args.wikipedia or args.csv_url:
+        if args.paths or args.url:
             print(
                 "Fehler: --from-jsonl und Quellenangaben schliessen sich aus.",
                 file=sys.stderr,
@@ -245,8 +229,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             raw_documents = load_documents(
                 sources,
                 on_event=hook,
-                wikipedia_language=args.wiki_lang,
-                wikipedia_max_docs=args.wiki_max_docs,
             )
         except UnsupportedFormatError as exc:
             print(f"Fehler: {exc}", file=sys.stderr)

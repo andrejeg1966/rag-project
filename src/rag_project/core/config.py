@@ -132,7 +132,7 @@ class Settings(BaseSettings):
     default_document: str = DEFAULT_DOCUMENT_NAME
 
     #: Weitere Dokumente, die neben :attr:`default_document` geladen werden.
-    #: In der .env als kommagetrennte Liste: DOCUMENT_FILES=handbuch.txt,anhang.md
+    #: In der .env als kommagetrennte Liste: DOCUMENT_FILES=handbuch.txt,anhang.pdf
     document_files: str = ""
 
     # ------------------------------------------------------------- Typing

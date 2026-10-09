@@ -1,18 +1,20 @@
+import pytest
+
 from rag_project.app.main_cleaning import build_parser
 
 
-def test_cleaning_parser_accepts_wikipedia_arguments():
+def test_cleaning_parser_accepts_url_arguments():
     args = build_parser().parse_args([
-        "--wikipedia",
-        "Artificial intelligence",
-        "--wiki-lang",
-        "en",
-        "--wiki-max-docs",
-        "2",
+        "--url",
+        "https://example.com/page",
         "--allow-remote",
     ])
 
-    assert args.wikipedia == ["Artificial intelligence"]
-    assert args.wiki_lang == "en"
-    assert args.wiki_max_docs == 2
+    assert args.url == ["https://example.com/page"]
     assert args.allow_remote is True
+
+
+@pytest.mark.parametrize("option", ["--wikipedia", "--csv-url", "--wiki-lang"])
+def test_cleaning_parser_rejects_moved_sources(option):
+    with pytest.raises(SystemExit):
+        build_parser().parse_args([option, "x"])

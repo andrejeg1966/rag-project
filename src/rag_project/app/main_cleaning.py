@@ -84,27 +84,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     remote = parser.add_argument_group(
         "netzbasierte Quellen",
-        "Optionen fuer src:http..., src:wikipedia:... und src:csv:...",
+        "Optionen fuer src:http...",
     )
     remote.add_argument(
         "--url", action="append", default=[], metavar="ADRESSE",
         help="Webseite laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wikipedia", action="append", default=[], metavar="THEMA",
-        help="Wikipedia-Artikel zum Thema laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--csv-url", action="append", default=[], metavar="ADRESSE",
-        help="entfernte CSV-Datei laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wiki-lang", default="de",
-        help="Sprachversion fuer Wikipedia (Standard: de)",
-    )
-    remote.add_argument(
-        "--wiki-max-docs", type=int, default=1,
-        help="Zahl der Wikipedia-Artikel je Thema (Standard: 1)",
     )
     remote.add_argument(
         "--allow-remote", action="store_true",
@@ -150,8 +134,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     local_arguments, prefixed_remote = _split_sources(args.paths)
     remote_sources = list(prefixed_remote)
     remote_sources.extend(args.url)
-    remote_sources.extend(f"wikipedia:{topic}" for topic in args.wikipedia)
-    remote_sources.extend(f"csv:{url}" for url in args.csv_url)
 
     if not _assert_remote_enabled(remote_sources, args.allow_remote):
         return 1
@@ -172,8 +154,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         documents = load_documents(
             [str(path) for path in paths] + list(remote_sources),
             on_event=None,
-            wikipedia_language=args.wiki_lang,
-            wikipedia_max_docs=args.wiki_max_docs,
         )
     except UnsupportedFormatError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)

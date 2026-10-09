@@ -31,6 +31,19 @@ class ProviderError(RuntimeError):
 
 class MissingCredentialsError(ProviderError):
     """Der fuer den gewaehlten Provider noetige Key fehlt."""
+    def __init__(self, provider: ChatProvider, message: str | None = None):
+        # Falls keine spezifische Nachricht übergeben wird, generieren wir eine Standardmeldung
+        if message is None:
+            message = (
+                f"Missing credentials for provider {provider.value}. "
+                f"Please set the environment variable {provider.env_var}."
+                f"Der für den Provider '{provider}' nötige API-Key ist nicht gesetzt."
+            )
+        # Aufruf des Konstruktors der Basisklasse (ProviderError)
+        super().__init__(message)
+
+        # Speichern des Provider-Namens für spätere Fehlerbehandlung
+        self.provider = provider
 
 
 class ClientBuildError(ProviderError):

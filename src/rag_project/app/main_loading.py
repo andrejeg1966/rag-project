@@ -13,8 +13,9 @@ aufgeloest -- eine URL ist kein Pfad und darf nicht gegen das Arbeits- oder
 Dokumentenverzeichnis geprueft werden:
 
     src:https://example.com/handbuch    Webseite als Text
-    src:wikipedia:RAG                   Wikipedia-Artikel
-    src:csv:https://example.com/d.csv   entfernte CSV-Datei
+
+CSV, Markdown und Wikipedia laden die eigenen Befehle csv-load,
+markdown-load und wikipedia-load.
 
 Das Praefix ``src:`` ist noetig, damit die Anwendung Quellen von Pfaden
 unterscheiden kann. Ohne Praefix gilt ein Argument als Dateipfad.
@@ -49,9 +50,6 @@ from rag_project.core.paths import (
 #: Praefix, das ein Argument als netzbasierte Quelle kennzeichnet.
 SOURCE_PREFIX = "src:"
 
-#: Praefixe innerhalb der Quelle, die die Bibliothek kennt.
-REMOTE_PREFIXES = ("http://", "https://", "wikipedia:", "csv:")
-
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -68,7 +66,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Zeichen der Vorschau pro Datei (0 = keine Vorschau)",
     )
     parser.add_argument(
-        "--encoding", default="utf-8", help="Kodierung fuer Text- und CSV-Dateien"
+        "--encoding", default="utf-8", help="Kodierung fuer Textdateien"
     )
     parser.add_argument(
         "--show-paths", action="store_true",
@@ -86,27 +84,11 @@ def build_parser() -> argparse.ArgumentParser:
     # --- netzbasierte Quellen ------------------------------------------------
     remote = parser.add_argument_group(
         "netzbasierte Quellen",
-        "Optionen fuer src:http..., src:wikipedia:... und src:csv:...",
+        "Optionen fuer src:http...",
     )
     remote.add_argument(
         "--url", action="append", default=[], metavar="ADRESSE",
         help="Webseite laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wikipedia", action="append", default=[], metavar="THEMA",
-        help="Wikipedia-Artikel zum Thema laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--csv-url", action="append", default=[], metavar="ADRESSE",
-        help="entfernte CSV-Datei laden; mehrfach angebbar",
-    )
-    remote.add_argument(
-        "--wiki-lang", default="de",
-        help="Sprachversion fuer Wikipedia (Standard: de)",
-    )
-    remote.add_argument(
-        "--wiki-max-docs", type=int, default=1,
-        help="Zahl der Wikipedia-Artikel je Thema (Standard: 1)",
     )
     remote.add_argument(
         "--allow-remote", action="store_true",
@@ -178,8 +160,6 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     # Optionen wie --url ergaenzen die Quellen aus den Positionsargumenten.
     remote_sources.extend(args.url)
-    remote_sources.extend(f"wikipedia:{topic}" for topic in args.wikipedia)
-    remote_sources.extend(f"csv:{url}" for url in args.csv_url)
 
     if not _assert_remote_enabled(remote_sources, args.allow_remote):
         return 1
@@ -209,8 +189,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             sources,
             encoding=args.encoding,
             on_event=hook,
-            wikipedia_language=args.wiki_lang,
-            wikipedia_max_docs=args.wiki_max_docs,
         )
     except UnsupportedFormatError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)
